@@ -65,3 +65,48 @@ Return ONLY the final Markdown report as your last message.`;
     assert.equal(result, "custom default");
   });
 });
+
+describe("parseAssistantMessage", () => {
+  // Mirrors the message-processing logic in index.js
+  function parseAssistantMessage(message) {
+    let report = "";
+    const toolCalls = [];
+    for (const block of message.content) {
+      if (block.type === "text" && block.text.trim()) {
+        report = block.text;
+      } else if (block.type === "tool_use") {
+        toolCalls.push(block.input?.query || block.input?.url || "");
+      }
+    }
+    return { report, toolCalls };
+  }
+
+  it("extracts the latest text block as the report", () => {
+    const msg = { content: [{ type: "text", text: "first" }, { type: "text", text: "final report" }] };
+    const { report } = parseAssistantMessage(msg);
+    assert.equal(report, "final report");
+  });
+
+  it("ignores text blocks that are only whitespace", () => {
+    const msg = { content: [{ type: "text", text: "real report" }, { type: "text", text: "   " }] };
+    const { report } = parseAssistantMessage(msg);
+    assert.equal(report, "real report");
+  });
+
+  it("collects tool_use query strings", () => {
+    const msg = {
+      content: [
+        { type: "tool_use", name: "WebSearch", input: { query: "AI news" } },
+        { type: "tool_use", name: "WebFetch",  input: { url: "https://example.com" } },
+      ],
+    };
+    const { toolCalls } = parseAssistantMessage(msg);
+    assert.deepEqual(toolCalls, ["AI news", "https://example.com"]);
+  });
+
+  it("returns empty report and no tool calls for an empty content array", () => {
+    const { report, toolCalls } = parseAssistantMessage({ content: [] });
+    assert.equal(report, "");
+    assert.deepEqual(toolCalls, []);
+  });
+});
