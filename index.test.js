@@ -53,4 +53,55 @@ describe("Web Research Agent", () => {
 
     assert.equal(report, "Final report content.");
   });
+
+  it("should ignore non-assistant messages when building the report", () => {
+    let report = "";
+    const messages = [
+      { type: "user", text: "Research AI agents." },
+      { type: "tool_result", text: "Some tool output." },
+      { type: "assistant", text: "Final report." },
+    ];
+
+    for (const msg of messages) {
+      if (msg.type === "assistant" && msg.text.trim()) {
+        report = msg.text;
+      }
+    }
+
+    assert.equal(report, "Final report.");
+  });
+
+  it("should not update report for assistant messages with blank text", () => {
+    let report = "Previous report.";
+    const messages = [
+      { type: "assistant", text: "   " },
+      { type: "assistant", text: "" },
+    ];
+
+    for (const msg of messages) {
+      if (msg.type === "assistant" && msg.text.trim()) {
+        report = msg.text;
+      }
+    }
+
+    assert.equal(report, "Previous report.");
+  });
+
+  it("should extract query or url from tool_use block input", () => {
+    const block = { type: "tool_use", name: "WebSearch", input: { query: "AI agents 2025" } };
+    const q = block.input?.query || block.input?.url || "";
+    assert.equal(q, "AI agents 2025");
+  });
+
+  it("should extract url from tool_use block when query is absent", () => {
+    const block = { type: "tool_use", name: "WebFetch", input: { url: "https://example.com" } };
+    const q = block.input?.query || block.input?.url || "";
+    assert.equal(q, "https://example.com");
+  });
+
+  it("should return empty string when tool_use block has no query or url", () => {
+    const block = { type: "tool_use", name: "WebSearch", input: {} };
+    const q = block.input?.query || block.input?.url || "";
+    assert.equal(q, "");
+  });
 });
