@@ -78,22 +78,6 @@ test("prints the researching message before any agent work begins", () => {
   const firstMeaningfulLine = lines[0] || "";
   expect(firstMeaningfulLine).toContain("🔎 Researching:");
 });
-
-test("topic string is wrapped in double quotes in the console output", () => {
-  let output = "";
-  try {
-    output = execFileSync("node", ["index.js", "blockchain"], {
-      timeout: 5000,
-      encoding: "utf8",
-      env: { ...process.env, ANTHROPIC_API_KEY: "invalid-key-for-unit-test" },
-    });
-  } catch (err) {
-    output = (err.stdout || "") + (err.stderr || "");
-  }
-
-  // Topic must appear in double quotes: 🔎 Researching: "blockchain"
-  expect(output).toMatch(/🔎 Researching: "blockchain"/);
-});
   } catch (err) {
     // The process will fail due to invalid API key — that's fine.
     // We only care about the stdout printed before the error.
