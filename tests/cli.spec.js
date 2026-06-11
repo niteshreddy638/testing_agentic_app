@@ -78,6 +78,24 @@ test("prints the researching message before any agent work begins", () => {
   const firstMeaningfulLine = lines[0] || "";
   expect(firstMeaningfulLine).toContain("🔎 Researching:");
 });
+
+test("output does not contain the researching message for an unrelated string", () => {
+  let output = "";
+  try {
+    output = execFileSync("node", ["index.js", "climate change"], {
+      timeout: 5000,
+      encoding: "utf8",
+      env: { ...process.env, ANTHROPIC_API_KEY: "invalid-key-for-unit-test" },
+    });
+  } catch (err) {
+    output = (err.stdout || "") + (err.stderr || "");
+  }
+
+  // Should NOT contain a different topic in the researching line
+  expect(output).not.toContain('🔎 Researching: "quantum computing"');
+  // But should contain the actual topic
+  expect(output).toContain('🔎 Researching: "climate change"');
+});
   } catch (err) {
     // The process will fail due to invalid API key — that's fine.
     // We only care about the stdout printed before the error.
