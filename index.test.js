@@ -85,6 +85,14 @@ describe("Prompt construction", () => {
     expect(prompt).toContain(`Topic: "${topic}"`);
   });
 
+  test("prompt contains all required report section headers", () => {
+    const prompt = buildPrompt("test topic");
+    expect(prompt).toContain("# Title");
+    expect(prompt).toContain("## Summary");
+    expect(prompt).toContain("## Key Findings");
+    expect(prompt).toContain("## Details");
+    expect(prompt).toContain("## Sources");
+  });
 });
 
 describe("Output file naming", () => {
