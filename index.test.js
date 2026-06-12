@@ -83,4 +83,24 @@ describe("runResearchAgent", () => {
     expect(result).toBe("");
     expect(mockWriteFileSync).toHaveBeenCalledWith("report.md", "");
   });
+
+  it("ignores assistant messages whose text blocks are whitespace-only", async () => {
+    mockQuery.mockReturnValue(
+      makeMessages([
+        {
+          type: "assistant",
+          message: { content: [{ type: "text", text: "   \n  " }] },
+        },
+        {
+          type: "assistant",
+          message: { content: [{ type: "text", text: "# Real Report" }] },
+        },
+      ])
+    );
+
+    const result = await runResearchAgent("whitespace test");
+
+    expect(result).toBe("# Real Report");
+    expect(mockWriteFileSync).toHaveBeenCalledWith("report.md", "# Real Report");
+  });
 });
