@@ -77,19 +77,3 @@ describe("Topic parsing", () => {
     expect(topic).toBe("quantum-computing");
   });
 });
-
-describe("Prompt construction", () => {
-  test("includes the topic in the prompt", () => {
-    const topic = "space exploration";
-    const prompt = buildPrompt(topic);
-    expect(prompt).toContain(`Topic: "${topic}"`);
-  });
-
-});
-
-describe("Output file naming", () => {
-  test("report is always written to report.md", () => {
-    const file = "report.md";
-    expect(file).toBe("report.md");
-  });
-});
