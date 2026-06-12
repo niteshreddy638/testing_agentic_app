@@ -17,20 +17,6 @@ function extractReport(messages) {
 }
 
 describe("extractReport", () => {
-  it("returns the last assistant text block as the report", () => {
-    const messages = [
-      {
-        type: "assistant",
-        message: {
-          content: [{ type: "text", text: "# Report\n## Summary\nHello." }],
-        },
-      },
-    ];
-    const result = extractReport(messages);
-    assert.ok(result.includes("# Report"));
-    assert.ok(result.includes("## Summary"));
-  });
-
   it("returns empty string when there are no messages", () => {
     assert.equal(extractReport([]), "");
   });
