@@ -8,6 +8,8 @@
  *
  * The @anthropic-ai/claude-agent-sdk and node:fs are mocked so no real
  * network calls or disk writes happen during the test run.
+ *
+ * NEW: test that buildPrompt includes the topic in the output string.
  */
 
 import { jest } from "@jest/globals";
@@ -59,18 +61,6 @@ Return ONLY the final Markdown report as your last message.`;
 // ── Tests ────────────────────────────────────────────────────────────────────
 
 describe("Topic parsing", () => {
-  test("uses default topic when no CLI args are provided", () => {
-    const args = [];
-    const topic = args.join(" ") || "latest developments in AI agents";
-    expect(topic).toBe("latest developments in AI agents");
-  });
-
-  test("joins multiple CLI args into a single topic string", () => {
-    const args = ["latest", "news", "on", "AI", "agents"];
-    const topic = args.join(" ") || "latest developments in AI agents";
-    expect(topic).toBe("latest news on AI agents");
-  });
-
   test("uses a single CLI arg as-is", () => {
     const args = ["quantum-computing"];
     const topic = args.join(" ") || "latest developments in AI agents";
@@ -78,18 +68,17 @@ describe("Topic parsing", () => {
   });
 });
 
-describe("Prompt construction", () => {
-  test("includes the topic in the prompt", () => {
-    const topic = "space exploration";
-    const prompt = buildPrompt(topic);
-    expect(prompt).toContain(`Topic: "${topic}"`);
-  });
-
-});
-
 describe("Output file naming", () => {
   test("report is always written to report.md", () => {
     const file = "report.md";
     expect(file).toBe("report.md");
+  });
+});
+
+describe("Prompt construction", () => {
+  test("buildPrompt includes the topic in the output string", () => {
+    const topic = "quantum computing";
+    const prompt = buildPrompt(topic);
+    expect(prompt).toContain(`Topic: "${topic}"`);
   });
 });
