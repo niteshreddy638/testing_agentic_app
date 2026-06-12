@@ -49,4 +49,14 @@ describe("extractReport", () => {
   it("returns empty string when there are no messages", () => {
     assert.equal(extractReport([]), "");
   });
+
+  it("skips assistant messages with only whitespace text", () => {
+    const messages = [
+      {
+        type: "assistant",
+        message: { content: [{ type: "text", text: "   " }] },
+      },
+    ];
+    assert.equal(extractReport(messages), "");
+  });
 });
