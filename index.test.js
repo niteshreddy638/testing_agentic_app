@@ -20,4 +20,11 @@ describe("extractReport", () => {
   it("returns empty string when there are no messages", () => {
     assert.equal(extractReport([]), "");
   });
+
+  it("ignores non-assistant messages", () => {
+    const messages = [
+      { type: "user", message: { content: [{ type: "text", text: "hello" }] } },
+    ];
+    assert.equal(extractReport(messages), "");
+  });
 });
